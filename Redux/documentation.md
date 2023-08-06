@@ -1,4 +1,4 @@
-Understand the Terms - 
+#Understand the Terms - 
 
 1. Store - The store is the central and single source of truth for the application's state. It holds the entire state tree of your application. In Redux, there should only be one store in your application. The store is responsible for managing the state, handling actions, and notifying the view (usually a UI component) when the state changes.
 
@@ -15,3 +15,16 @@ The Redux flow can be summarized as follows:
 3. Reducers handle the dispatched actions and update the state.
 4. The store notifies subscribers (usually UI components) about the state changes.
 5. UI components re-render based on the updated state.
+
+
+* When we are dispatching any action it should be dispatched instantly, meaning that if we dispatch any data in the payload and the data is coming after awaiting any api call then the program will give us error. Why so? As said the action should be dispatched instantly and return a plain object. Refer to the code, the code will give error as in the payload we are getting the data.price after awaiting the api call.
+
+```
+async function initUser(val){
+    const {data} = await axios.get('https://fakestoreapi.com/products');
+    return ({type:init, payload:{amount:data.price}})
+}
+
+store.dispatch(initUser())
+
+```
