@@ -1,4 +1,4 @@
-#Understand the Terms - 
+## Understand the Terms - 
 
 1. Store - The store is the central and single source of truth for the application's state. It holds the entire state tree of your application. In Redux, there should only be one store in your application. The store is responsible for managing the state, handling actions, and notifying the view (usually a UI component) when the state changes.
 
@@ -8,7 +8,7 @@
 
 4. Dispatch - Dispatching an action means sending the action to the Redux store. To update the state in Redux, you dispatch actions using the dispatch method provided by the store. When an action is dispatched, it triggers the corresponding reducer(s) to handle the action and update the state accordingly.
 
-The Redux flow can be summarized as follows:
+**The Redux flow can be summarized as follows:**
 
 1. Components trigger actions (e.g., user clicks a button).
 2. Actions are dispatched to the Redux store.
@@ -16,8 +16,11 @@ The Redux flow can be summarized as follows:
 4. The store notifies subscribers (usually UI components) about the state changes.
 5. UI components re-render based on the updated state.
 
+## What does middleware mean in redux?
 
-* When we are dispatching any action it should be dispatched instantly, meaning that if we dispatch any data in the payload and the data is coming after awaiting any api call then the program will give us error. Why so? As said the action should be dispatched instantly and return a plain object. Refer to the code, the code will give error as in the payload we are getting the data.price after awaiting the api call.
+In Redux, middleware is a way to extend the store's capabilities by intercepting actions that are dispatched and transforming them before they reach the reducers. It sits between the action creators and the reducers, allowing you to apply additional logic to the actions and perform various tasks, such as handling asynchronous operations, logging, and more.
+
+When we are dispatching any action it should be dispatched instantly, meaning that if we dispatch any data in the payload and the data is coming after awaiting any api call then the program will give us error. Why so? As said the action should be dispatched instantly and return a plain object. Refer to the code, the code will give error as in the payload we are getting the data.price after awaiting the api call.
 
 ```
 async function initUser(val){
@@ -26,5 +29,23 @@ async function initUser(val){
 }
 
 store.dispatch(initUser())
+
+```
+
+That's where redux-thunk comes in - When you apply the Redux Thunk middleware, it allows you to dispatch functions as actions instead of just plain objects. The middleware recognizes that a function is being dispatched and calls that function with the dispatch and getState arguments.
+
+```
+const store = createStore(reducer, applyMiddleware(logger.default,thunk.default));
+
+async function getuser(dispatch, getState){
+    const {data} = await axios.get('https://fakestoreapi.com/products/1');
+    dispatch(initUser(data.price))
+}
+
+function initUser(value){
+    return ({type:init, payload:{amount:value}})
+}
+
+store.dispatch(getuser);
 
 ```

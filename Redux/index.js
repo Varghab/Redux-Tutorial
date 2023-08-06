@@ -1,5 +1,7 @@
-import { createStore } from 'redux';
+import { applyMiddleware, createStore } from 'redux';
 import axios from 'axios';
+import logger from 'redux-logger';
+import thunk from 'redux-thunk';
 // Declaration of constants so that name of the action type doesn't change by mistake
 const init = "INIT";
 const inc = "INCREMENT";
@@ -13,7 +15,7 @@ const initialState = {
 }
 
 //Creating the store by passing the reduce function as argument
-const store = createStore(reducer);
+const store = createStore(reducer, applyMiddleware(logger.default,thunk.default));
 
 
 function reducer(state=initialState, action){
@@ -33,19 +35,17 @@ function reducer(state=initialState, action){
     
 }
 
-//Async API call
-
-async function getUser(){
-    const {data} = await axios.get('https://fakestoreapi.com/products');
-    console.log(data);
+//Action creators - 
+function getuser(id){
+    return async(dispatch, getState) => {
+        const {data} = await axios.get(`https://fakestoreapi.com/products/${id}`);
+        dispatch(initUser(data.price))
+    }
+    
 }
 
-getUser();
-
-//Action creators - 
-async function initUser(val){
-    const {data} = await axios.get('https://fakestoreapi.com/products');
-    return ({type:init, payload:{amount:data.price}})
+function initUser(value){
+    return ({type:init, payload:{amount:value}})
 }
 
 function increment(){
@@ -61,11 +61,5 @@ function incrementByAmount(value){
 }
 
 
-// store.dispatch({type:"decrement"})
-// store.dispatch({type:"incrementByAmount", payload:{amount:4}})
-// store.dispatch({type:"incrementByAmount", payload:{amount:4}})
-// store.dispatch(increment());
-// store.dispatch(decrement());
-// store.dispatch(incrementByAmount(7));
-store.dispatch(initUser());
+store.dispatch(getuser(5));
 console.log(store.getState());
